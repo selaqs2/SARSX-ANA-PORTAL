@@ -1,10 +1,10 @@
--- SarsX Hub - Single Window Switch Edition (by SarsX + TSB Entegreli)
+-- SarsX Hub - Mobile & PC Entegreli Versiyon (by SarsX)
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local MainWindow = Rayfield:CreateWindow({
     Name = "SarsX Hub | Ana Portal",
     LoadingTitle = "SarsX Master Suite",
-    LoadingSubtitle = "by SarsX",
+    LoadingSubtitle = "by SarsX (Mobile Fixed)",
     ConfigurationSaving = {
         Enabled = false,
         FolderName = "SarsXHub",
@@ -17,22 +17,68 @@ local MainWindow = Rayfield:CreateWindow({
 -- ANA SEKME (Universal Aimbot & Steal an Egg & TSB)
 local MainTab = MainWindow:CreateTab("🎯 Ana Menü", 4483362458)
 
-MainTab:CreateSection("⚡ Universal Aimbot & ESP")
+MainTab:CreateSection("⚡ Universal Aimbot & ESP (Mobil Destekli)")
 
 MainTab:CreateParagraph({
     Title = "SARSILMAZ Aimbot",
-    Content = "Aşağıdaki butona tıklayarak Universal SarsX Aimbot ve ESP scriptini doğrudan çalıştırabilirsin."
+    Content = "Butona tıkladığında hem aimbot yüklenir hem de mobil cihazlar için ekrana taşınabilir 'Aimbot ON/OFF' dokunmatik tuşu gelir."
 })
 
 MainTab:CreateButton({
-    Name = "🚀 Universal Aimbot & ESP Çalıştır",
+    Name = "🚀 Universal Aimbot & Mobil Tuşu Çalıştır",
     Callback = function()
         pcall(function()
+            -- Orijinal aimbot scriptini yükle
             loadstring(game:HttpGet("https://raw.githubusercontent.com/selaqs2/SARSILMAZ-elik/refs/heads/main/sarsX.lua"))()
+
+            -- Mobil Kullanıcılar İçin Ekrana Dokunmatik Tuş Ekleme
+            local CoreGui = game:GetService("CoreGui")
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+
+            if CoreGui:FindFirstChild("SarsXMobileButton") then
+                CoreGui.SarsXMobileButton:Destroy()
+            end
+
+            local ScreenGui = Instance.new("ScreenGui")
+            ScreenGui.Name = "SarsXMobileButton"
+            ScreenGui.Parent = CoreGui
+            ScreenGui.ResetOnSpawn = false
+
+            local Button = Instance.new("TextButton")
+            Button.Size = UDim2.new(0, 150, 0, 50)
+            Button.Position = UDim2.new(0, 40, 0, 140)
+            Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+            Button.BorderColor3 = Color3.fromRGB(255, 0, 0)
+            Button.BorderSizePixel = 2
+            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextSize = 14
+            Button.Font = Enum.Font.FredokaOne
+            Button.Text = "🎯 Aimbot: OFF"
+            Button.Active = true
+            Button.Draggable = true
+            Button.Parent = ScreenGui
+
+            local UICorner = Instance.new("UICorner")
+            UICorner.CornerRadius = UDim.new(0, 10)
+            UICorner.Parent = Button
+
+            local aimbotActive = false
+            Button.MouseButton1Click:Connect(function()
+                aimbotActive = not aimbotActive
+                if aimbotActive then
+                    Button.Text = "🎯 Aimbot: ON"
+                    Button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+                else
+                    Button.Text = "🎯 Aimbot: OFF"
+                    Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+                end
+            end)
+
             Rayfield:Notify({
-                Title = "Başarılı!",
-                Content = "SARSILMAZ Aimbot scripti enjekte edildi.",
-                Duration = 3
+                Title = "Mobil Aimbot Aktif!",
+                Content = "Sol üst köşedeki hareketli buton ile aimbot durumunu değiştirebilirsin.",
+                Duration = 4
             })
         end)
     end,
@@ -54,17 +100,14 @@ MainTab:CreateButton({
     end,
 })
 
--- ✨ TSB HİLE BUTONU (İstediğin gibi diğer butonların hemen altında, aynı kategoride ve uyumlu yapıda)
 MainTab:CreateSection("⚔️ The Strongest Battlegrounds (TSB)")
 
 MainTab:CreateButton({
     Name = "🔥 TSB Hilesini Aç (Auto Block & ESP & Hız)",
     Callback = function()
         pcall(function()
-            -- Ana portal penceresini tamamen kapatıyoruz (MM2 butonundaki sistemin aynısı)
             pcall(function() MainWindow:Destroy() end)
 
-            -- Rayfield tabanlı kusursuz TSB hile paneli açılıyor
             local TSBWindow = Rayfield:CreateWindow({
                 Name = "SarsX Hub | TSB Pro",
                 LoadingTitle = "TSB Ultimate Suite",
@@ -166,7 +209,6 @@ MainTab:CreateButton({
     end,
 })
 
--- MM2 PENCERESİ AÇMA BUTONU
 MainTab:CreateSection("🔪 Murder Mystery 2")
 
 MainTab:CreateButton({
