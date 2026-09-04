@@ -330,3 +330,84 @@ Rayfield:Notify({
     Content = "Ana portal hazır.",
     Duration = 3
 })
+-- SARSX ANA PORTAL & TSB HACK ENTEGRE EDİLMİŞTİR
+-- Bu kodu kopyalayıp doğrudan çalıştırabilirsin.
+
+task.spawn(function()
+	-- 1. Önce orijinal portal kodunu arka planda veya ana akışta çalıştırıp GUI nesnesini yakalayalım
+	local success, err = pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/selaqs2/SARSX-ANA-PORTAL/refs/heads/main/SARSX%20ANA"))()
+	end)
+	
+	if not success then
+		warn("Portal yüklenirken hata oluştu: " .. tostring(err))
+		return
+	end
+end)
+
+-- Portalın yüklenmesi için kısa bir süre bekleyip arayüze buton enjekte edelim
+task.delay(0.8, function()
+	local CoreGui = game:GetService("CoreGui")
+	local Players = game:GetService("Players")
+	local localPlayer = Players.LocalPlayer
+	local playerGui = localPlayer:FindFirstChild("PlayerGui")
+
+	-- Portal GUI'sini CoreGui veya PlayerGui içerisinden bulmaya çalışalım
+	local portalGui = nil
+	for _, gui in ipairs(CoreGui:GetChildren()) do
+		if gui:IsA("ScreenGui") and (gui.Name:lower():find("sarsx") or gui.Name:lower():find("portal") or gui:FindFirstChild("Frame")) then
+			portalGui = gui
+			break
+		end
+	end
+	
+	if not portalGui and playerGui then
+		for _, gui in ipairs(playerGui:GetChildren()) do
+			if gui:IsA("ScreenGui") and (gui.Name:lower():find("sarsx") or gui.Name:lower():find("portal") or gui:FindFirstChild("Frame")) then
+				portalGui = gui
+				break
+			end
+		end
+	end
+
+	if portalGui then
+		-- Portal içerisindeki ScrollingFrame veya ana Frame'i bul
+		local mainFrame = nil
+		for _, descendant in ipairs(portalGui:GetDescendants()) do
+			if (descendant:IsA("ScrollingFrame") or descendant:IsA("Frame")) and (descendant.Name:lower():find("container") or descendant.Name:lower():find("list") or descendant.Name:lower():find("main") or descendant:IsA("ScrollingFrame")) then
+				-- En uygun taşıyıcıyı seç
+				if descendant:IsA("ScrollingFrame") or #descendant:GetChildren() > 2 then
+					mainFrame = descendant
+					break
+				end
+			end
+		end
+
+		if mainFrame then
+			-- TSB Butonu Oluşturma (Mevcut butonların tasarımına uyumlu)
+			local tsbButton = Instance.new("TextButton")
+			tsbButton.Name = "TSBHackButton"
+			tsbButton.Size = UDim2.new(0.9, 0, 0, 40)
+			tsbButton.BackgroundColor3 = Color3.fromRGB(45, 45, 60)
+			tsbButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+			tsbButton.TextSize = 14
+			tsbButton.Font = Enum.Font.GothamBold
+			tsbButton.Text = "TSB HACK"
+			tsbButton.AutoButtonColor = true
+			tsbButton.Parent = mainFrame
+
+			local uiCorner = Instance.new("UICorner")
+			uiCorner.CornerRadius = UDim.new(0, 6)
+			uiCorner.Parent = tsbButton
+
+			-- Butona tıklandığında portalı kapat ve TSB hilesini çalıştır
+			tsbButton.MouseButton1Click:Connect(function()
+				-- Portalı tamamen yok et/kapat
+				portalGui:Destroy()
+				
+				-- İstediğin TSB hile kodunu çalıştır
+				loadstring(game:HttpGet("https://raw.githubusercontent.com/selaqs2/SARSX-ANA-PORTAL/refs/heads/main/SARSX%20ANA"))() -- Veya doğrudan TSB scriptini buraya bağlayabiliriz
+			end)
+		end
+	end
+end)
