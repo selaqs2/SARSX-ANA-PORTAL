@@ -1,0 +1,332 @@
+-- SarsX Hub - Single Window Switch Edition (by SarsX)
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local MainWindow = Rayfield:CreateWindow({
+    Name = "SarsX Hub | Ana Portal",
+    LoadingTitle = "SarsX Master Suite",
+    LoadingSubtitle = "by SarsX",
+    ConfigurationSaving = {
+        Enabled = false,
+        FolderName = "SarsXHub",
+        FileName = "MasterConfig"
+    },
+    KeySystem = false,
+    ToggleAnimations = true,
+})
+
+-- ANA SEKME (Universal Aimbot & Steal an Egg)
+local MainTab = MainWindow:CreateTab("🎯 Ana Menü", 4483362458)
+
+MainTab:CreateSection("⚡ Universal Aimbot & ESP")
+
+MainTab:CreateParagraph({
+    Title = "SARSILMAZ Aimbot",
+    Content = "Aşağıdaki butona tıklayarak Universal SarsX Aimbot ve ESP scriptini doğrudan çalıştırabilirsin."
+})
+
+MainTab:CreateButton({
+    Name = "🚀 Universal Aimbot & ESP Çalıştır",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/selaqs2/SARSILMAZ-elik/refs/heads/main/sarsX.lua"))()
+            Rayfield:Notify({
+                Title = "Başarılı!",
+                Content = "SARSILMAZ Aimbot scripti enjekte edildi.",
+                Duration = 3
+            })
+        end)
+    end,
+})
+
+MainTab:CreateSection("🥚 Diğer Oyunlar")
+
+MainTab:CreateButton({
+    Name = "🥚 Steal an Egg Scriptini Çalıştır",
+    Callback = function()
+        pcall(function()
+            loadstring(game:HttpGet("https://rawscripts.net/raw/Steal-An-Egg-bypass-anti-cheat-224212", true))()
+            Rayfield:Notify({
+                Title = "Yumurta Çalma Aktif!",
+                Content = "Steal an Egg scripti başarıyla yüklendi.",
+                Duration = 3
+            })
+        end)
+    end,
+})
+
+-- MM2 PENCERESİ AÇMA BUTONU
+MainTab:CreateSection("🔪 Murder Mystery 2")
+
+MainTab:CreateButton({
+    Name = "📂 MM2 Pro Menüsünü Aç",
+    Callback = function()
+        pcall(function()
+            -- Ana portal penceresini tamamen kapatıyoruz
+            pcall(function() MainWindow:Destroy() end)
+
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local Workspace = game:GetService("Workspace")
+            local Camera = Workspace.CurrentCamera
+            local LocalPlayer = Players.LocalPlayer
+
+            local MM2Window = Rayfield:CreateWindow({
+                Name = "SarsX Hub | MM2 Pro",
+                LoadingTitle = "MM2 Ultimate Suite",
+                LoadingSubtitle = "by SarsX",
+                ConfigurationSaving = { Enabled = false },
+                KeySystem = false,
+            })
+
+            local MM2Tab = MM2Window:CreateTab("🔪 MM2 Kontrolleri", 4483362458)
+
+            local MM2Settings = {
+                ESP = false,
+                RoleReveal = false,
+                SheriffAimbot = false,
+                AutoGrabGun = false,
+                KillAura = false,
+                FlingPlayer = false,
+                FlingTarget = "",
+                FOVRadius = 150
+            }
+
+            MM2Tab:CreateToggle({
+                Name = "👁️ ESP & Wallhack (Kutular)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.ESP = Value end,
+            })
+            MM2Tab:CreateToggle({
+                Name = "👥 Gelişmiş Rol Görme (Katil Kırmızı / Şerif Mavi)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.RoleReveal = Value end,
+            })
+
+            MM2Tab:CreateToggle({
+                Name = "🎯 Şerif Aimbot (Katile Kilitlen)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.SheriffAimbot = Value end,
+            })
+            MM2Tab:CreateSlider({
+                Name = "⚙️ MM2 Aimbot FOV Yarıçapı",
+                Range = {50, 400},
+                Increment = 5,
+                Suffix = "px",
+                CurrentValue = 150,
+                Callback = function(Value) MM2Settings.FOVRadius = Value end,
+            })
+
+            MM2Tab:CreateToggle({
+                Name = "🔫 Otomatik Silah Alma (Gun Grab)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.AutoGrabGun = Value end,
+            })
+            MM2Tab:CreateToggle({
+                Name = "⚔️ Kill Aura (Katilken Yakındakileri Kes)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.KillAura = Value end,
+            })
+
+            MM2Tab:CreateInput({
+                Name = "🌪️ Fling Hedef Oyuncu (İsmi)",
+                PlaceholderText = "Oyuncu adının başı...",
+                RemoveTextAfterFocusLost = false,
+                Callback = function(Text) MM2Settings.FlingTarget = Text end,
+            })
+            MM2Tab:CreateToggle({
+                Name = "🌀 Hedefi Flingle (Uçur)",
+                CurrentValue = false,
+                Callback = function(Value) MM2Settings.FlingPlayer = Value end,
+            })
+
+            local mm2EspCache = {}
+
+            local function cleanMM2ESP(player)
+                if mm2EspCache[player] then
+                    if mm2EspCache[player].Highlight then mm2EspCache[player].Highlight:Destroy() end
+                    if mm2EspCache[player].Billboard then mm2EspCache[player].Billboard:Destroy() end
+                    mm2EspCache[player] = nil
+                end
+            end
+
+            local function setupMM2ESP(player)
+                if player == LocalPlayer then return end
+                cleanMM2ESP(player)
+                local function apply(char)
+                    pcall(function()
+                        cleanMM2ESP(player)
+                        local head = char:WaitForChild("Head", 5)
+                        if not head then return end
+
+                        local hl = Instance.new("Highlight")
+                        hl.Adornee = char
+                        hl.FillTransparency = 0.5
+                        hl.OutlineTransparency = 0
+                        hl.Parent = char
+
+                        local bb = Instance.new("BillboardGui")
+                        bb.Adornee = head
+                        bb.Size = UDim2.new(0, 150, 0, 40)
+                        bb.StudsOffset = Vector3.new(0, 2.2, 0)
+                        bb.AlwaysOnTop = true
+
+                        local txt = Instance.new("TextLabel")
+                        txt.Parent = bb
+                        txt.BackgroundTransparency = 1
+                        txt.Size = UDim2.new(1, 0, 1, 0)
+                        txt.Font = Enum.Font.FredokaOne
+                        txt.TextSize = 12
+                        txt.TextStrokeTransparency = 0
+                        txt.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+                        bb.Parent = char
+                        mm2EspCache[player] = { Highlight = hl, Billboard = bb, Text = txt, Character = char }
+                    end)
+                end
+                player.CharacterAdded:Connect(apply)
+                if player.Character then task.spawn(function() apply(player.Character) end) end
+            end
+
+            for _, p in ipairs(Players:GetPlayers()) do setupMM2ESP(p) end
+            Players.PlayerAdded:Connect(setupMM2ESP)
+            Players.PlayerRemoving:Connect(function(p) cleanMM2ESP(p) end)
+
+            RunService.RenderStepped:Connect(function()
+                pcall(function()
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer then
+                            local data = mm2EspCache[player]
+                            if data and data.Character and data.Character:FindFirstChild("Humanoid") and data.Character.Humanoid.Health > 0 then
+                                local char = data.Character
+                                local bp = player:FindFirstChild("Backpack")
+                                local hasKnife = char:FindFirstChild("Knife") or (bp and bp:FindFirstChild("Knife"))
+                                local hasGun = char:FindFirstChild("Gun") or (bp and bp:FindFirstChild("Gun"))
+
+                                local roleColor = Color3.fromRGB(0, 255, 0)
+                                local roleName = "Innocent"
+
+                                if hasKnife then
+                                    roleColor = Color3.fromRGB(255, 0, 0)
+                                    roleName = "MURDERER"
+                                elseif hasGun then
+                                    roleColor = Color3.fromRGB(0, 150, 255)
+                                    roleName = "SHERIFF"
+                                end
+
+                                if MM2Settings.ESP or MM2Settings.RoleReveal then
+                                    data.Highlight.Enabled = true
+                                    data.Highlight.FillColor = roleColor
+                                    data.Highlight.OutlineColor = roleColor
+                                    
+                                    if MM2Settings.RoleReveal and (hasKnife or hasGun) then
+                                        data.Text.Text = player.Name .. " [" .. roleName .. "]"
+                                        data.Text.TextColor3 = roleColor
+                                        data.Billboard.Enabled = true
+                                    else
+                                        data.Text.Text = player.Name
+                                        data.Text.TextColor3 = Color3.fromRGB(255, 255, 255)
+                                        data.Billboard.Enabled = MM2Settings.ESP
+                                    end
+                                else
+                                    data.Highlight.Enabled = false
+                                    data.Billboard.Enabled = false
+                                end
+                            else
+                                if data and data.Highlight then
+                                    data.Highlight.Enabled = false
+                                    data.Billboard.Enabled = false
+                                end
+                            end
+                        end
+                    end
+
+                    if MM2Settings.SheriffAimbot then
+                        local closestTarget = nil
+                        local shortestDist = MM2Settings.FOVRadius
+                        local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
+
+                        for _, player in ipairs(Players:GetPlayers()) do
+                            if player ~= LocalPlayer and player.Character then
+                                local char = player.Character
+                                local hum = char:FindFirstChild("Humanoid")
+                                local head = char:FindFirstChild("Head")
+                                local bp = player:FindFirstChild("Backpack")
+                                local hasKnife = char:FindFirstChild("Knife") or (bp and bp:FindFirstChild("Knife"))
+
+                                if hum and hum.Health > 0 and head and hasKnife then
+                                    local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                                    if onScreen then
+                                        local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                                        if dist < shortestDist then
+                                            shortestDist = dist
+                                            closestTarget = head
+                                        end
+                                    end
+                                end
+                            end
+                        end
+
+                        if closestTarget then
+                            local currentCFrame = Camera.CFrame
+                            local targetCFrame = CFrame.new(currentCFrame.Position, closestTarget.Position)
+                            Camera.CFrame = currentCFrame:Lerp(targetCFrame, 0.25)
+                        end
+                    end
+
+                    if MM2Settings.AutoGrabGun then
+                        for _, obj in ipairs(Workspace:GetDescendants()) do
+                            if obj.Name == "GunDrop" and obj:IsA("BasePart") and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                                LocalPlayer.Character.HumanoidRootPart.CFrame = obj.CFrame
+                            end
+                        end
+                    end
+
+                    if MM2Settings.KillAura and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Knife") then
+                        local myRoot = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                        if myRoot then
+                            for _, player in ipairs(Players:GetPlayers()) do
+                                if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                    local targetRoot = player.Character.HumanoidRootPart
+                                    if (myRoot.Position - targetRoot.Position).Magnitude < 15 then
+                                        local knife = LocalPlayer.Character:FindFirstChild("Knife")
+                                        if knife:FindFirstChild("Remote") then
+                                            knife.Remote:FireServer(targetRoot.Position)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    if MM2Settings.FlingPlayer and MM2Settings.FlingTarget ~= "" then
+                        for _, player in ipairs(Players:GetPlayers()) do
+                            if player.Name:lower():sub(1, #MM2Settings.FlingTarget) == MM2Settings.FlingTarget:lower() then
+                                if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                                    local targetRoot = player.Character.HumanoidRootPart
+                                    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+                                    if myRoot then
+                                        myRoot.CFrame = targetRoot.CFrame
+                                        myRoot.AssemblyLinearVelocity = Vector3.new(35000, 35000, 35000)
+                                        myRoot.AssemblyAngularVelocity = Vector3.new(35000, 35000, 35000)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+            end)
+
+            Rayfield:Notify({
+                Title = "MM2 Menüsü Açıldı!",
+                Content = "Ana portal kapatıldı ve MM2 Pro penceresi yüklendi.",
+                Duration = 3
+            })
+        end)
+    end,
+})
+
+Rayfield:Notify({
+    Title = "SarsX Hub Yüklendi!",
+    Content = "Ana portal hazır.",
+    Duration = 3
+})
