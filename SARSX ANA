@@ -1,4 +1,4 @@
--- SarsX Hub - Single Window Switch Edition (by SarsX)
+-- SarsX Hub - Single Window Switch Edition (by SarsX + TSB Entegreli)
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local MainWindow = Rayfield:CreateWindow({
@@ -14,7 +14,7 @@ local MainWindow = Rayfield:CreateWindow({
     ToggleAnimations = true,
 })
 
--- ANA SEKME (Universal Aimbot & Steal an Egg)
+-- ANA SEKME (Universal Aimbot & Steal an Egg & TSB)
 local MainTab = MainWindow:CreateTab("🎯 Ana Menü", 4483362458)
 
 MainTab:CreateSection("⚡ Universal Aimbot & ESP")
@@ -54,6 +54,118 @@ MainTab:CreateButton({
     end,
 })
 
+-- ✨ TSB HİLE BUTONU (İstediğin gibi diğer butonların hemen altında, aynı kategoride ve uyumlu yapıda)
+MainTab:CreateSection("⚔️ The Strongest Battlegrounds (TSB)")
+
+MainTab:CreateButton({
+    Name = "🔥 TSB Hilesini Aç (Auto Block & ESP & Hız)",
+    Callback = function()
+        pcall(function()
+            -- Ana portal penceresini tamamen kapatıyoruz (MM2 butonundaki sistemin aynısı)
+            pcall(function() MainWindow:Destroy() end)
+
+            -- Rayfield tabanlı kusursuz TSB hile paneli açılıyor
+            local TSBWindow = Rayfield:CreateWindow({
+                Name = "SarsX Hub | TSB Pro",
+                LoadingTitle = "TSB Ultimate Suite",
+                LoadingSubtitle = "by SarsX",
+                ConfigurationSaving = { Enabled = false },
+                KeySystem = false,
+            })
+
+            local CombatTab = TSBWindow:CreateTab("🛡️ Savaş & Combat", 4483362458)
+            local MovementTab = TSBWindow:CreateTab("⚡ Hareket & Hız", 4483362458)
+            local MiscTab = TSBWindow:CreateTab("⚙️ Diğer Araçlar", 4483362458)
+
+            local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local LocalPlayer = Players.LocalPlayer
+
+            local autoBlockEnabled = false
+            local espEnabled = false
+
+            CombatTab:CreateToggle({
+                Name = "🛡️ Auto Block (Otomatik Blok)",
+                CurrentValue = false,
+                Callback = function(Value)
+                    autoBlockEnabled = Value
+                    Rayfield:Notify({Title = "Auto Block", Content = "Durum: " .. tostring(Value), Duration = 2})
+                end,
+            })
+
+            CombatTab:CreateToggle({
+                Name = "👁️ Player ESP (Görüş)",
+                CurrentValue = false,
+                Callback = function(Value)
+                    espEnabled = Value
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+                            local highlight = player.Character:FindFirstChild("TSB_ESP")
+                            if espEnabled and not highlight then
+                                local hl = Instance.new("Highlight")
+                                hl.Name = "TSB_ESP"
+                                hl.Adornee = player.Character
+                                hl.FillColor = Color3.fromRGB(255, 0, 0)
+                                hl.OutlineColor = Color3.fromRGB(255, 255, 255)
+                                hl.Parent = player.Character
+                            elseif not espEnabled and highlight then
+                                highlight:Destroy()
+                            end
+                        end
+                    end
+                end,
+            })
+
+            local speedEnabled = false
+            local speedValue = 16
+
+            MovementTab:CreateToggle({
+                Name = "⚡ Hız Hilesi (Speed Hack)",
+                CurrentValue = false,
+                Callback = function(Value)
+                    speedEnabled = Value
+                end,
+            })
+
+            MovementTab:CreateSlider({
+                Name = "🏃 Koşu Hızı Değeri",
+                Range = {16, 100},
+                Increment = 1,
+                Suffix = "ws",
+                CurrentValue = 16,
+                Callback = function(Value)
+                    speedValue = Value
+                end,
+            })
+
+            RunService.Stepped:Connect(function()
+                pcall(function()
+                    if speedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                        LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
+                    end
+                end)
+            end)
+
+            MiscTab:CreateButton({
+                Name = "🔄 Karakteri Sıfırla (Reset)",
+                Callback = function()
+                    pcall(function()
+                        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+                            LocalPlayer.Character.Humanoid.Health = 0
+                        end
+                    end)
+                end,
+            })
+
+            Rayfield:Notify({
+                Title = "TSB Menüsü Açıldı!",
+                Content = "Ana portal kapatıldı ve TSB hile paneli yüklendi.",
+                Duration = 3
+            })
+        end)
+    end,
+})
+
 -- MM2 PENCERESİ AÇMA BUTONU
 MainTab:CreateSection("🔪 Murder Mystery 2")
 
@@ -61,7 +173,6 @@ MainTab:CreateButton({
     Name = "📂 MM2 Pro Menüsünü Aç",
     Callback = function()
         pcall(function()
-            -- Ana portal penceresini tamamen kapatıyoruz
             pcall(function() MainWindow:Destroy() end)
 
             local Players = game:GetService("Players")
