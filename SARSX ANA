@@ -1,10 +1,10 @@
--- SarsX Hub - Mobile & PC Entegreli Versiyon (by SarsX)
+-- SarsX Hub - Universal Direct Lock Versiyon (by SarsX)
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local MainWindow = Rayfield:CreateWindow({
     Name = "SarsX Hub | Ana Portal",
     LoadingTitle = "SarsX Master Suite",
-    LoadingSubtitle = "by SarsX (Mobile Fixed)",
+    LoadingSubtitle = "by SarsX (Direct Lock Fixed)",
     ConfigurationSaving = {
         Enabled = false,
         FolderName = "SarsXHub",
@@ -17,67 +17,66 @@ local MainWindow = Rayfield:CreateWindow({
 -- ANA SEKME (Universal Aimbot & Steal an Egg & TSB)
 local MainTab = MainWindow:CreateTab("🎯 Ana Menü", 4483362458)
 
-MainTab:CreateSection("⚡ Universal Aimbot & ESP (Mobil Destekli)")
+MainTab:CreateSection("⚡ Universal Aimbot & ESP")
 
 MainTab:CreateParagraph({
-    Title = "SARSILMAZ Aimbot",
-    Content = "Butona tıkladığında hem aimbot yüklenir hem de mobil cihazlar için ekrana taşınabilir 'Aimbot ON/OFF' dokunmatik tuşu gelir."
+    Title = "SARSILMAZ Aimbot (Direkt Kilitlenme)",
+    Content = "Butona bastığında aimbot aktifleşir. Ekstra tuşa basmana veya dürbün açmana gerek kalmadan en yakın rakibin kafasına otomatik odaklanır."
 })
 
 MainTab:CreateButton({
-    Name = "🚀 Universal Aimbot & Mobil Tuşu Çalıştır",
+    Name = "🚀 Universal Aimbot'u Aktif Et",
     Callback = function()
         pcall(function()
             -- Orijinal aimbot scriptini yükle
             loadstring(game:HttpGet("https://raw.githubusercontent.com/selaqs2/SARSILMAZ-elik/refs/heads/main/sarsX.lua"))()
 
-            -- Mobil Kullanıcılar İçin Ekrana Dokunmatik Tuş Ekleme
-            local CoreGui = game:GetService("CoreGui")
+            -- Ekstra tuş gerektirmeyen, otomatik doğrudan kilitlenen sistem (Silent/Cam Lock)
             local Players = game:GetService("Players")
+            local RunService = game:GetService("RunService")
+            local Workspace = game:GetService("Workspace")
+            local Camera = Workspace.CurrentCamera
             local LocalPlayer = Players.LocalPlayer
 
-            if CoreGui:FindFirstChild("SarsXMobileButton") then
-                CoreGui.SarsXMobileButton:Destroy()
-            end
+            local aimbotRunning = true
 
-            local ScreenGui = Instance.new("ScreenGui")
-            ScreenGui.Name = "SarsXMobileButton"
-            ScreenGui.Parent = CoreGui
-            ScreenGui.ResetOnSpawn = false
+            RunService.RenderStepped:Connect(function()
+                if not aimbotRunning then return end
+                pcall(function()
+                    local closestTarget = nil
+                    local shortestDist = math.huge
+                    local screenCenter = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
 
-            local Button = Instance.new("TextButton")
-            Button.Size = UDim2.new(0, 150, 0, 50)
-            Button.Position = UDim2.new(0, 40, 0, 140)
-            Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-            Button.BorderColor3 = Color3.fromRGB(255, 0, 0)
-            Button.BorderSizePixel = 2
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-            Button.TextSize = 14
-            Button.Font = Enum.Font.FredokaOne
-            Button.Text = "🎯 Aimbot: OFF"
-            Button.Active = true
-            Button.Draggable = true
-            Button.Parent = ScreenGui
+                    for _, player in ipairs(Players:GetPlayers()) do
+                        if player ~= LocalPlayer and player.Character then
+                            local char = player.Character
+                            local hum = char:FindFirstChild("Humanoid")
+                            local head = char:FindFirstChild("Head")
 
-            local UICorner = Instance.new("UICorner")
-            UICorner.CornerRadius = UDim.new(0, 10)
-            UICorner.Parent = Button
+                            if hum and hum.Health > 0 and head then
+                                local screenPos, onScreen = Camera:WorldToViewportPoint(head.Position)
+                                if onScreen then
+                                    local dist = (Vector2.new(screenPos.X, screenPos.Y) - screenCenter).Magnitude
+                                    if dist < shortestDist then
+                                        shortestDist = dist
+                                        closestTarget = head
+                                    end
+                                end
+                            end
+                        end
+                    end
 
-            local aimbotActive = false
-            Button.MouseButton1Click:Connect(function()
-                aimbotActive = not aimbotActive
-                if aimbotActive then
-                    Button.Text = "🎯 Aimbot: ON"
-                    Button.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
-                else
-                    Button.Text = "🎯 Aimbot: OFF"
-                    Button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-                end
+                    if closestTarget then
+                        local currentCFrame = Camera.CFrame
+                        local targetCFrame = CFrame.new(currentCFrame.Position, closestTarget.Position)
+                        Camera.CFrame = currentCFrame:Lerp(targetCFrame, 0.35)
+                    end
+                end)
             end)
 
             Rayfield:Notify({
-                Title = "Mobil Aimbot Aktif!",
-                Content = "Sol üst köşedeki hareketli buton ile aimbot durumunu değiştirebilirsin.",
+                Title = "Aimbot Başarıyla Başlatıldı!",
+                Content = "Görüş alanındaki en yakın hedefe otomatik kilitlenme aktif.",
                 Duration = 4
             })
         end)
